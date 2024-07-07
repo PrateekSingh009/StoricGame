@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "205105338543",
+    "project_id": "thestoricgame",
+    "storage_bucket": "thestoricgame.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:205105338543:android:4bd926744c722b89dd1c5a",
+        "android_client_info": {
+          "package_name": "com.projects.thestoricgame"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxBr311-PLtNR2gEvYrKXHktQmx1M0nos"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
