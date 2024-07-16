@@ -1,7 +1,7 @@
 package com.projects.thestoricgame.model
 
 data class Chapter(
-    val characters: Map<String, CharacterItem>
+    val messages: List<MessageItem>
 ) {
-    constructor() : this(mapOf())
+    constructor() : this(listOf())
 }

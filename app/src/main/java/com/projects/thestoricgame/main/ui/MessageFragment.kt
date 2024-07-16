@@ -15,6 +15,7 @@ import com.projects.thestoricgame.databinding.FragmentMessageBinding
 import com.projects.thestoricgame.main.adapter.ListAdapter
 import com.projects.thestoricgame.main.adapter.MessagesListAdapter
 import com.projects.thestoricgame.main.data.ListViewModel
+import com.projects.thestoricgame.main.dialog.ChoiceDialog
 import com.projects.thestoricgame.model.CharacterItem
 import com.projects.thestoricgame.model.MessageItem
 import com.projects.thestoricgame.utils.extensions.replaceFragment
@@ -73,10 +74,10 @@ class MessageFragment(private val user: UserItem) : Fragment() {
         }
     }
 
-    private fun setupMessageRecyclerView(list: List<CharacterItem>?) {
+    private fun setupMessageRecyclerView(list: List<MessageItem>?) {
         if (list != null) {
             val messageList = mutableListOf<MessageItem>()
-            val listAdapter = MessagesListAdapter("Prateek")
+            val listAdapter = MessagesListAdapter(::showDialogFragment)
             binding.messagesRecyclerView.apply {
                 adapter = listAdapter
                 layoutManager = LinearLayoutManager(context)
@@ -91,17 +92,27 @@ class MessageFragment(private val user: UserItem) : Fragment() {
         }
     }
 
-    private fun emitItemsWithDelay(items: List<CharacterItem>): Flow<MessageItem> = flow {
+    private fun emitItemsWithDelay(items: List<MessageItem>): Flow<MessageItem> = flow {
         for (item in items) {
-            item.messages.forEach {
-                emit(it.value)
-                delay(2000L)
-            }
+            emit(item)
+            delay(2000L)
         }
     }
 
     private fun refreshRecyclerView(messages: MutableList<MessageItem>) {
         (binding.messagesRecyclerView.adapter as MessagesListAdapter).submitList(messages.toList())
+    }
+
+    private fun showDialogFragment(item: MessageItem) {
+        val dialogFragment = ChoiceDialog(item, ::jumpToNextMessageItem)
+        dialogFragment.show(
+            parentFragmentManager,
+            dialogFragment.tag
+        )
+    }
+
+    private fun jumpToNextMessageItem(jumpToIndex : Int) {
+
     }
 
     private fun setupToolbar(user: UserItem) {

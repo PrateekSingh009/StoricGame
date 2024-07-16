@@ -1,6 +1,7 @@
 package com.projects.thestoricgame.main.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -8,19 +9,29 @@ import com.projects.thestoricgame.databinding.ListItemMessageReceivedBinding
 import com.projects.thestoricgame.databinding.ListItemMessageSentBinding
 import com.projects.thestoricgame.model.MessageItem
 import com.projects.thestoricgame.utils.callbacks.MessageDiffCallback
+import com.projects.thestoricgame.utils.utility.AppConstants
 import com.projects.thestoricgame.viewholders.ReceivedMessageViewHolder
 import com.projects.thestoricgame.viewholders.SentMessageViewHolder
 
-class MessagesListAdapter(private val userId: String) :
+class MessagesListAdapter(val showDialog : (MessageItem) -> Unit) :
     ListAdapter<MessageItem, RecyclerView.ViewHolder>(
         MessageDiffCallback()
     ) {
 
     private val holderTypeMessageReceived = 1
     private val holderTypeMessageSent = 2
+    private val holderTypeChoice = 3
 
     override fun getItemViewType(position: Int): Int {
-        return if (getItem(position).senderID != userId) {
+        return when(getItem(position).messageType) {
+            AppConstants.TYPE_MESSAGE -> typeOfMessage(position)
+            AppConstants.TYPE_CHOICE -> holderTypeChoice
+            else -> typeOfMessage(position)
+        }
+    }
+
+    private fun typeOfMessage(position : Int) : Int {
+        return if (getItem(position).senderID != AppConstants.USER_ID) {
             holderTypeMessageReceived
         } else {
             holderTypeMessageSent
@@ -36,6 +47,8 @@ class MessagesListAdapter(private val userId: String) :
             holderTypeMessageReceived -> (holder as ReceivedMessageViewHolder).bind(
                 getItem(position)
             )
+
+//            holderTypeChoice -> showDialog.invoke(getItem(position))
         }
     }
 
@@ -53,8 +66,20 @@ class MessagesListAdapter(private val userId: String) :
                 ReceivedMessageViewHolder(binding)
             }
 
+            holderTypeChoice -> object : RecyclerView.ViewHolder(View(parent.context)) {}
+
             else -> {
                 throw Exception("Error reading holder type")
+            }
+        }
+    }
+
+    override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        if (holder.itemViewType == holderTypeChoice) {
+            val position = holder.adapterPosition
+            if (position != RecyclerView.NO_POSITION) {
+                showDialog(getItem(position))
             }
         }
     }

@@ -20,8 +20,8 @@ class ListViewModel @Inject constructor(private val repository: ListRepository) 
     val userListLiveData: LiveData<UIState<List<UserItem>>>
         get() = _userListLiveData
 
-    val _messageListLiveData = MutableLiveData<UIState<List<CharacterItem>>>()
-    val messageListLiveData: LiveData<UIState<List<CharacterItem>>>
+    val _messageListLiveData = MutableLiveData<UIState<List<MessageItem>>>()
+    val messageListLiveData: LiveData<UIState<List<MessageItem>>>
         get() = _messageListLiveData
 
     fun getUserListFromDb() {
@@ -29,9 +29,9 @@ class ListViewModel @Inject constructor(private val repository: ListRepository) 
         repository.getUserListFromDB() {_userListLiveData.value = it}
     }
 
-    fun getMessageFromDb(chapter_number : Int) {
+    fun getMessageFromDb(chapterNumber : Int) {
         _messageListLiveData.value = UIState.Loading
-        repository.getMessageFromDB(chapter_number) {_messageListLiveData.value = it}
+        repository.getMessageFromDB(chapterNumber) {_messageListLiveData.value = it}
     }
 
     fun addDataToDb(story: Story) {

@@ -9,6 +9,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
+import com.google.firebase.database.getValue
 import com.google.firebase.firestore.firestore
 import com.projects.thestoricgame.model.UserItem
 import com.projects.thestoricgame.main.api.ApiService
@@ -49,37 +50,42 @@ class ListRepository @Inject constructor(private val apiService: ApiService) {
         database.child("Story").setValue(story)
     }
 
-    fun getMessageFromDB(chapter_number : Int,result: (UIState<List<CharacterItem>>) -> Unit) {
-        val databaseReference = FirebaseDatabase.getInstance().getReference("Story/chapters/${chapter_number}/characters")
+    fun getMessageFromDB(chapterNumber : Int, result: (UIState<List<MessageItem>>) -> Unit) {
+        val databaseReference = FirebaseDatabase.getInstance().getReference("Story/chapters/${chapterNumber}/messages")
 
         databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val allCharactersMessages = mutableListOf<CharacterItem>()
+                val allMessages = mutableListOf<MessageItem>()
 
-                for (characterSnapshot in dataSnapshot.children) {
-                    val characterName = characterSnapshot.key
-                    if (characterName != null) {
-                        val messagesMap = mutableMapOf<String,MessageItem>()
-                        val messagesSnapshot = characterSnapshot.child("messages")
-
-                        for (messageSnapshot in messagesSnapshot.children) {
-                            if (messageSnapshot.exists() && messageSnapshot.key != "0") {
-                                val message = messageSnapshot.getValue(MessageItem::class.java)
-                                message?.let { messageSnapshot.key?.let { key ->
-                                    messagesMap.put(
-                                        key,message)
-                                } }
-                            }
-                        }
-                        allCharactersMessages.add(CharacterItem(characterName, messagesMap))
-                    }
+                for (snapshot in dataSnapshot.children){
+                    snapshot.getValue(MessageItem::class.java)?.let { allMessages.add(it) }
                 }
+//                for (characterSnapshot in dataSnapshot.children) {
+//                    val characterName = characterSnapshot.key
+//                    if (characterName != null) {
+//                        val messagesMap = mutableMapOf<String,MessageItem>()
+//                        val messagesSnapshot = characterSnapshot.child("messages")
+//
+//                        for (messageSnapshot in messagesSnapshot.children) {
+//                            if (messageSnapshot.exists() && messageSnapshot.key != "0") {
+//                                val message = messageSnapshot.getValue(MessageItem::class.java)
+//                                message?.let { messageSnapshot.key?.let { key ->
+//                                    messagesMap.put(
+//                                        key,message)
+//                                } }
+//                            }
+//                        }
+//                        allMessages.add(CharacterItem(characterName, messagesMap))
+//                    }
+//                }
 
-                allCharactersMessages.forEach { characterMessages ->
-                    Log.d("CharacterMessages", "Character: ${characterMessages.Name}, Messages: ${characterMessages.messages}")
-                }
+
+
+//                allMessages.forEach { characterMessages ->
+//                    Log.d("CharacterMessages", "Character: ${characterMessages.Name}, Messages: ${characterMessages.messages}")
+//                }
                 result.invoke(
-                    UIState.Success(allCharactersMessages)
+                    UIState.Success(allMessages)
                 )
             }
 

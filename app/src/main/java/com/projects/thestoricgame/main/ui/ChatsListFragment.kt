@@ -25,15 +25,15 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ChatsListFragment : Fragment() {
 
-    private lateinit var _binding : FragmentChatsListBinding
+    private lateinit var _binding: FragmentChatsListBinding
     private val binding get() = _binding
-    private val viewModel : ListViewModel by viewModels<ListViewModel>()
+    private val viewModel: ListViewModel by viewModels<ListViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentChatsListBinding.inflate(inflater,container,false)
+        _binding = FragmentChatsListBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -44,22 +44,24 @@ class ChatsListFragment : Fragment() {
 //        dummyDataToDb()
     }
 
-    private fun onItemClick(item : UserItem) {
+    private fun onItemClick(item: UserItem) {
         parentFragmentManager.replaceFragment(MessageFragment(item), R.id.fragment_container)
     }
 
     private fun setupObserver() {
         viewModel.userListLiveData.observe(viewLifecycleOwner) { state ->
-            when(state) {
+            when (state) {
                 is UIState.Loading -> {
-                    Log.e(TAG,"Loading")
+                    Log.e(TAG, "Loading")
                 }
+
                 is UIState.Failure -> {
-                    Log.e(TAG,state.error.toString())
+                    Log.e(TAG, state.error.toString())
                 }
+
                 is UIState.Success -> {
                     state.data.let {
-                        Log.i("UserItem",it.toString())
+                        Log.i("UserItem", it.toString())
                         setupRecyclerView(it)
                     }
                 }
@@ -67,7 +69,7 @@ class ChatsListFragment : Fragment() {
         }
     }
 
-    private fun setupRecyclerView(list : List<UserItem>?) {
+    private fun setupRecyclerView(list: List<UserItem>?) {
         if (list != null) {
             binding.chatsRecyclerView.apply {
                 adapter = ListAdapter(list, ::onItemClick)
@@ -77,20 +79,37 @@ class ChatsListFragment : Fragment() {
     }
 
     private fun dummyDataToDb() {
-        val smsg1 = MessageItem("Hi","Prateek","Sejal")
-        val smsg2 = MessageItem("How are you?","Prateek","Sejal")
-        val smsg3 = MessageItem("I am fine!!","Prateek","Sejal")
-        val smsg4 = MessageItem("What you doing?","Prateek","Sejal")
+        val smsg1 = MessageItem(
+            messageType = "message", choices = null, message = "Hi", senderID = "Prateek", receiverID = "Sejal"
+        )
+        val smsg2 = MessageItem(
+            messageType = "message", choices =null, message = "How are you?", senderID = "Prateek", receiverID = "Sejal"
+        )
+        val smsg3 = MessageItem(
+            messageType = "message", choices =null, message = "I am fine!!", senderID = "Prateek", receiverID = "Sejal"
+        )
+        val smsg4 = MessageItem(
+            messageType = "message", choices =null, message = "What you doing?", senderID = "Prateek", receiverID = "Sejal"
+        )
 
-        val rmsg1 = MessageItem("Hey","Sejal","Prateek")
-        val rmsg2 = MessageItem("I am good","Sejal","Prateek")
-        val rmsg3 = MessageItem("Nothing!!!!!","Sejal","Prateek")
-        val rmsg4 = MessageItem("What you doing?","Sejal","Prateek")
+        val rmsg1 = MessageItem(
+            messageType = "message", choices =null, message = "Hey", senderID = "Sejal", receiverID = "Prateek"
+        )
+        val rmsg2 = MessageItem(
+            messageType = "message", choices =null, message = "I am good", senderID = "Sejal", receiverID = "Prateek"
+        )
+        val rmsg3 = MessageItem(
+            messageType = "message", choices =null, message = "Nothing!!!!!", senderID = "Sejal", receiverID = "Prateek"
+        )
+        val rmsg4 = MessageItem(
+            messageType = "message", choices =null, message = "Making a call", senderID = "Sejal", receiverID = "Prateek"
+        )
 
-        val prateek_dialogue = CharacterItem("Prateek",hashMapOf("1" to smsg1,"2" to smsg2,"3" to smsg3,"4" to smsg4))
-        val sejal_dialogue = CharacterItem("Sejal",hashMapOf("1" to rmsg1,"2" to rmsg2,"3" to rmsg3,"4" to rmsg4))
+        val choice1 = MessageItem(
+            messageType = "choice", hashMapOf("No" to 6,"Yes" to 4), message = "Would you like to have a conversation?", senderID = null, receiverID = null
+        )
 
-        val chapter1 = Chapter(hashMapOf("Prateek" to prateek_dialogue,"Sejal" to sejal_dialogue))
+        val chapter1 = Chapter(listOf(smsg1,rmsg1,smsg2,choice1,rmsg2,smsg3,rmsg3,smsg4,rmsg4))
 
         val story = Story(hashMapOf("1" to chapter1))
 
